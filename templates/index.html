@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Telugu Morphological Analyzer</title>
+    <!-- Tailwind CSS CDN for utility-first styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Import Roboto font */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            /* Light blue gradient background */
+            background: linear-gradient(to right, #e0f2fe, #f0f9ff);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Hover effect for the main container */
+        .result-container {
+            transition: all 0.3s ease;
+        }
+        .result-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        /* Loading spinner indicator */
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Custom max‑width for responsiveness */
+        .custom-width {
+            max-width: 80%;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <!-- Main container with padded, centered content -->
+    <div class="container mx-auto px-4 py-12 flex-grow">
+        <!-- Title -->
+        <h1 class="text-4xl md:text-5xl font-bold text-blue-700 text-center mb-8">
+            Telugu Morphological Analyzer
+        </h1>
+        <!-- Input & result panel -->
+        <div class="max-w-5xl mx-auto custom-width bg-white rounded-lg shadow-lg p-6 md:p-8 result-container">
+            <!-- Input row with responsive layout -->
+            <div class="flex flex-col md:flex-row items-center gap-4 mb-6">
+                <!-- Text input for word/sentence -->
+                <input
+                    type="text"
+                    id="wordInput"
+                    placeholder="Enter a Telugu word or sentence"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                    autofocus
+                    aria-label="Enter a Telugu word or sentence"
+                />
+                <div class="flex gap-4">
+                    <!-- Analyze button triggers analyzeWord() -->
+                    <button
+                        class="analyze-btn bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors duration-200 font-semibold"
+                        onclick="analyzeWord()"
+                        aria-label="Analyze the input"
+                    >
+                        Analyze
+                    </button>
+                    <!-- Clear button resets input and result -->
+                    <button
+                        class="clear-btn bg-red-600 text-white px-6 py-3 rounded-md hover:bg-red-700 transition-colors duration-200 font-semibold"
+                        onclick="clearInput()"
+                        aria-label="Clear the input"
+                    >
+                        Clear
+                    </button>
+                </div>
+            </div>
+            <!-- Result display area -->
+            <div
+                class="result-container bg-gray-50 p-8 rounded-md min-h-[300px] text-lg overflow-y-auto"
+                id="result-container"
+            >
+                <p id="result" class="text-gray-700"></p>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white text-center py-4 mt-auto">
+        <p class="text-sm">Developed by Sabinikari Saman © 2025</p>
+    </footer>
+
+    <script>
+        let isAnalyzing = false;
+
+        async function analyzeWord() {
+            // Prevent duplicate requests
+            if (isAnalyzing) return;
+            const wordInput = document.getElementById("wordInput");
+            const result = document.getElementById("result");
+            const word = wordInput.value.trim();
+
+            // Validate non-empty input
+            if (!word) {
+                result.innerHTML = "<span class='text-red-600 font-bold'>Please enter a Telugu word or sentence.</span>";
+                return;
+            }
+
+            isAnalyzing = true;
+            // Show analyzing message and spinner
+            result.innerHTML = "<span class='text-blue-600'>Analyzing...</span>";
+            result.classList.add("loading");
+
+            // Simulate delay for UX, then call backend
+            setTimeout(async () => {
+                try {
+                    const response = await fetch("/analyze", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ word: word })
+                    });
+                    const data = await response.json();
+
+                    result.classList.remove("loading");
+
+                    // Handle error from server
+                    if (data.error) {
+                        result.innerHTML = `<span class='text-red-600 font-bold'>${data.error}</span>`;
+                    } else {
+                        // Color-code morpheme tags in the returned output
+                        result.innerHTML = data.output
+                            .replace(/_Prefix/g, "<span class='text-blue-600 font-bold'>_Prefix</span>")
+                            .replace(/_Root/g, "<span class='text-green-600 font-bold'>_Root</span>")
+                            .replace(/_Suffix/g, "<span class='text-red-600 font-bold'>_Suffix</span>")
+                            .replace(/_Reduplication/g, "<span class='text-purple-600 font-bold'>_Reduplication</span>");
+                    }
+                } catch (error) {
+                    result.classList.remove("loading");
+                    result.innerHTML = "<span class='text-red-600 font-bold'>An error occurred. Please try again.</span>";
+                } finally {
+                    isAnalyzing = false;
+                }
+            }, 1000); // 1‑second delay for spinner effect
+        }
+
+        // Clear the input field and result display
+        function clearInput() {
+            document.getElementById("wordInput").value = "";
+            document.getElementById("result").innerHTML = "";
+        }
+
+        // Allow pressing Enter to trigger analysis
+        document.getElementById("wordInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") analyzeWord();
+        });
+    </script>
+</body>
+</html>
