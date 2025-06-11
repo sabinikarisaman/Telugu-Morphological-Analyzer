@@ -84,12 +84,9 @@ The application follows a modular architecture:
 
 The core data files (`prefixes.json`, `suffixes.json`, `sandhi_rules.json`, and `known_roots.json`, `morfessor_telugu.model`, `bpe_telugu.model`) are included in this repository.
 
-**Important: The `telugu_corpus.txt` file is not included in this repository due to its large size.**  This file is essential for training the statistical models (Morfessor and BPE) to achieve optimal performance.  If you are interested in contributing to the project, improving the model's accuracy, or simply want to use the application with its full potential, please contact me:
+**Important: The `telugu_corpus.txt` file is not included directly in this repository due to its large size.** You can download it from the following Google Drive link: [Telugu Corpus (Google Drive)](https://drive.google.com/file/d/1i5G1FluRSFVpu0CcXojKL068801Q72u8/view?usp=drive_link)
 
-*   **Email:** sabinikarisaman@gmail.com
-*   **LinkedIn:** [https://www.linkedin.com/in/sabinikari-saman-706984257/](https://www.linkedin.com/in/sabinikari-saman-706984257/)
-
-I will provide you with instructions on how to obtain the corpus.  If you would like to provide your own corpus, please do!
+**Please be aware:** The corpus may be updated periodically, and the version available via the link may change. By downloading it, you acknowledge that you are solely responsible for all use, storage, and transfer of the contents of the file. Be advised that the original file creators may own licensing. It is recommended that the corpus is used for academic purposes only.
 
 ## Usage
 
